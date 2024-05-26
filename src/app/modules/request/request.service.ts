@@ -14,7 +14,7 @@ interface RequestWithOptional extends Omit<Request, "requesterId"> {
 }
 
 const createRequestIntoDB = async (payload: any) => {
-  const donor = await prisma.user.findUnique({
+  const donor = await prisma.user.findUniqueOrThrow({
     where: {
       id: payload.donorId,
     },
@@ -23,7 +23,6 @@ const createRequestIntoDB = async (payload: any) => {
   if (!donor) {
     throw new AppError(httpStatus.NOT_FOUND, "Invalid donor id");
   }
-
   const createRequest = await prisma.request.create({
     data: payload,
   });
@@ -66,18 +65,22 @@ const getMyDonationRequestFromDB = async (id: string) => {
     },
     select: {
       id: true,
-      donorId: true,
-      requesterId: true,
       phoneNumber: true,
       dateOfDonation: true,
       hospitalName: true,
       hospitalAddress: true,
       reason: true,
       requestStatus: true,
+      donor: {
+        select: {
+          bloodType: true,
+        },
+      },
       requester: {
         select: {
           id: true,
           name: true,
+          contact: true,
           email: true,
           bloodType: true,
           location: true,
@@ -88,6 +91,36 @@ const getMyDonationRequestFromDB = async (id: string) => {
   });
 
   return request;
+};
+
+const getMyDonationFromDB = async (id: string) => {
+  const donors = await prisma.request.findMany({
+    where: {
+      requesterId: id,
+    },
+    select: {
+      id: true,
+      phoneNumber: true,
+      dateOfDonation: true,
+      hospitalName: true,
+      hospitalAddress: true,
+      reason: true,
+      requestStatus: true,
+      donor: {
+        select: {
+          id: true,
+          name: true,
+          contact: true,
+          email: true,
+          bloodType: true,
+          location: true,
+          availability: true,
+        },
+      },
+    },
+  });
+
+  return donors;
 };
 
 const updateRequestStatusIntoDB = async (
@@ -109,5 +142,6 @@ const updateRequestStatusIntoDB = async (
 export const requestServices = {
   createRequestIntoDB,
   getMyDonationRequestFromDB,
+  getMyDonationFromDB,
   updateRequestStatusIntoDB,
 };

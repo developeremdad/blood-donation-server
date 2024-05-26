@@ -28,6 +28,18 @@ const getMyDonationRequest = catchAsync(async (req, res) => {
   });
 });
 
+const getMyDonation = catchAsync(async (req, res) => {
+  const user = req.user;
+  const result = await requestServices.getMyDonationFromDB(user?.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Donation retrieved successfully",
+    data: result,
+  });
+});
+
 const updateRequestStatus = catchAsync(async (req, res) => {
   const { requestId } = req.params;
   const result = await requestServices.updateRequestStatusIntoDB(
@@ -46,5 +58,6 @@ const updateRequestStatus = catchAsync(async (req, res) => {
 export const requestController = {
   createRequest,
   getMyDonationRequest,
+  getMyDonation,
   updateRequestStatus,
 };

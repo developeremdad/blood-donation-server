@@ -19,6 +19,8 @@ router.get(
   requestController.getMyDonationRequest
 );
 
+router.get("/my-donations", auth("USER"), requestController.getMyDonation);
+
 router.put(
   "/donation-request/:requestId",
   auth("USER"),

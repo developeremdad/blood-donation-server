@@ -11,7 +11,7 @@ router.post(
   userController.registerUser
 );
 
-router.get("/donor-list", auth("USER"), userController.getAllDonor);
+router.get("/donor-list", userController.getAllDonor);
 
 router.get("/my-profile", auth("USER"), userController.getMyProfile);
 router.get("/user-details/:id", auth("USER"), userController.getUserDetails);

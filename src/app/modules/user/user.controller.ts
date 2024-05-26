@@ -29,6 +29,7 @@ const getAllDonor = catchAsync(async (req, res) => {
   const filters = pickValidFields(req.query, [
     "name",
     "age",
+    "role",
     "searchTerm",
     "lastDonationDate",
     "availability",
