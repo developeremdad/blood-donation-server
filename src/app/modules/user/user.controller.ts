@@ -15,6 +15,19 @@ const registerUser = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req, res) => {
+  const user = req.user;
+  req.body.requesterId = user.id;
+  const result = await userService.getAllUsersFromDB();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "User Retrieve successfully",
+    data: result,
+  });
+});
+
 const getAllDonor = catchAsync(async (req, res) => {
   if (["A ", "B ", "AB ", "O "].includes(req?.query?.bloodType as string)) {
     const bloodType = `${req?.query?.bloodType}+`;
@@ -93,10 +106,24 @@ const updateMyProfile = catchAsync(async (req, res) => {
   });
 });
 
+const updateUserRoleStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await userService.updateUserRoleStatusIntoDB(id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User updated successfully",
+    data: result,
+  });
+});
+
 export const userController = {
   registerUser,
+  getAllUsers,
   getAllDonor,
   getMyProfile,
   getUserDetails,
   updateMyProfile,
+  updateUserRoleStatus,
 };

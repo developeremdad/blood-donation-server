@@ -54,6 +54,27 @@ const registerUserIntoDB = async (payload: any) => {
   return user;
 };
 
+const getAllUsersFromDB = async () => {
+  const result = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bloodType: true,
+      location: true,
+      status: true,
+      availability: true,
+      role: true,
+      contact: true,
+      photo: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
+};
+
 const getAllDonorFromDB = async (
   params: IUserFilterRequest,
   paginationOptions: IPaginationOptions
@@ -234,10 +255,22 @@ const updateMyProfileIntoDB = async (id: string, payload: any) => {
   return userWithOptionalPassword;
 };
 
+const updateUserRoleStatusIntoDB = async (id: string, payload: any) => {
+  const result = await prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const userService = {
   registerUserIntoDB,
+  getAllUsersFromDB,
   getAllDonorFromDB,
   getMyProfileFromDB,
   getUserDetailsFromDB,
   updateMyProfileIntoDB,
+  updateUserRoleStatusIntoDB,
 };
