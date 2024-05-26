@@ -15,11 +15,7 @@ router.get("/get-users", auth("ADMIN"), userController.getAllUsers);
 router.get("/donor-list", userController.getAllDonor);
 
 router.get("/my-profile", auth("USER", "ADMIN"), userController.getMyProfile);
-router.get(
-  "/user-details/:id",
-  auth("USER", "ADMIN"),
-  userController.getUserDetails
-);
+router.get("/user-details/:id", userController.getUserDetails);
 router.put(
   "/update-profile",
   auth("USER", "ADMIN"),
