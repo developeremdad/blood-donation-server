@@ -104,6 +104,7 @@ const getAllDonorFromDB = async (
       email: true,
       bloodType: true,
       location: true,
+      status: true,
       availability: true,
       role: true,
       contact: true,
@@ -140,11 +141,14 @@ const getAllDonorFromDB = async (
     where: whereCondition,
   });
 
+  const totalPage = Math.ceil(total / limit);
+
   return {
     meta: {
       page,
       limit,
       total,
+      totalPage,
     },
     data: result,
   };
