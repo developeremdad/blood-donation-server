@@ -14,13 +14,27 @@ router.post(
 router.get("/get-users", auth("ADMIN"), userController.getAllUsers);
 router.get("/donor-list", userController.getAllDonor);
 
-router.get("/my-profile", auth("USER"), userController.getMyProfile);
-router.get("/user-details/:id", auth("USER"), userController.getUserDetails);
-router.put("/update-profile", auth("USER"), userController.updateMyProfile);
+router.get("/my-profile", auth("USER", "ADMIN"), userController.getMyProfile);
+router.get(
+  "/user-details/:id",
+  auth("USER", "ADMIN"),
+  userController.getUserDetails
+);
+router.put(
+  "/update-profile",
+  auth("USER", "ADMIN"),
+  userController.updateMyProfile
+);
 router.put(
   "/update-user/:id",
   auth("ADMIN"),
   userController.updateUserRoleStatus
+);
+
+router.post(
+  "/change-password",
+  auth("USER", "ADMIN"),
+  userController.changePassword
 );
 
 export const userRouters = router;
