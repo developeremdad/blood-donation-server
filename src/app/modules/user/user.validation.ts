@@ -14,21 +14,21 @@ const registerUser = z.object({
     password: z.string({
       required_error: "Password is required!",
     }),
-    bloodType: z.string({
-      required_error: "Blood type is required!",
-    }),
-    location: z.string({
-      required_error: "Location is required!",
-    }),
+    // bloodType: z.string({
+    //   required_error: "Blood type is required!",
+    // }),
+    // location: z.string({
+    //   required_error: "Location is required!",
+    // }),
     age: z.number().int({
       message: "Age must be an integer!",
     }),
     bio: z.string({
       required_error: "Bio is required!",
     }),
-    lastDonationDate: z.string({
-      required_error: "Last donation date is required!",
-    }),
+    // lastDonationDate: z.string({
+    //   required_error: "Last donation date is required!",
+    // }),
   }),
 });
 

@@ -67,6 +67,18 @@ const getMyProfile = catchAsync(async (req, res) => {
   });
 });
 
+const getUserDetails = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await userService.getUserDetailsFromDB(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User details retrieved successfully",
+    data: result,
+  });
+});
+
 const updateMyProfile = catchAsync(async (req, res) => {
   const id = req.user.id;
   const result = await userService.updateMyProfileIntoDB(id, req.body);
@@ -83,5 +95,6 @@ export const userController = {
   registerUser,
   getAllDonor,
   getMyProfile,
+  getUserDetails,
   updateMyProfile,
 };

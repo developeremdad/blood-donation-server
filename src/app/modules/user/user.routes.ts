@@ -14,11 +14,7 @@ router.post(
 router.get("/donor-list", auth("USER"), userController.getAllDonor);
 
 router.get("/my-profile", auth("USER"), userController.getMyProfile);
-router.put(
-  "/my-profile",
-  auth("USER"),
-  validateRequest(userValidation.updateProfileSchema),
-  userController.updateMyProfile
-);
+router.get("/user-details/:id", auth("USER"), userController.getUserDetails);
+router.put("/update-profile", auth("USER"), userController.updateMyProfile);
 
 export const userRouters = router;

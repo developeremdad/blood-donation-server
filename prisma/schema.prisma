@@ -18,8 +18,8 @@ model User {
   bloodType    String?
   location     String?
   availability Boolean      @default(false)
-  photo        String       @default("")
-  contact      String
+  photo        String?      @default("")
+  contact      String       @default("")
   role         UserRoleEnum @default(USER)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -41,7 +41,7 @@ model Request {
   hospitalName    String
   hospitalAddress String
   reason          String
-  termsCondition  Boolean           @default(false)
+  termsCondition  Boolean
   requestStatus   RequestStatusEnum @default(PENDING)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt

@@ -1,4 +1,4 @@
-import { Prisma, User, UserProfile } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 import { IPaginationOptions } from "../../interface/pagination.type";
@@ -17,6 +17,9 @@ const registerUserIntoDB = async (payload: any) => {
     password: hashedPassword,
     bloodType: payload.bloodType,
     location: payload.location,
+    availability: false,
+    contact: payload.contact,
+    photo: payload.photo,
   };
 
   const result = await prisma.$transaction(async (transactionClient: any) => {
@@ -102,6 +105,9 @@ const getAllDonorFromDB = async (
       bloodType: true,
       location: true,
       availability: true,
+      role: true,
+      contact: true,
+      photo: true,
       createdAt: true,
       updatedAt: true,
       userProfile: {
@@ -156,6 +162,9 @@ const getMyProfileFromDB = async (id: string) => {
       bloodType: true,
       location: true,
       availability: true,
+      role: true,
+      contact: true,
+      photo: true,
       createdAt: true,
       updatedAt: true,
       userProfile: true,
@@ -165,23 +174,66 @@ const getMyProfileFromDB = async (id: string) => {
   return userProfile;
 };
 
-const updateMyProfileIntoDB = async (
-  id: string,
-  payload: Partial<UserProfile>
-) => {
-  const profile = await prisma.userProfile.update({
-    where: {
-      userId: id,
+const getUserDetailsFromDB = async (id: string) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bloodType: true,
+      location: true,
+      availability: true,
+      role: true,
+      contact: true,
+      photo: true,
+      createdAt: true,
+      updatedAt: true,
+      userProfile: true,
     },
-    data: payload,
+  });
+  return user;
+};
+
+const updateMyProfileIntoDB = async (id: string, payload: any) => {
+  const userProfileData = payload.userProfile;
+  delete payload.userProfile;
+
+  const userData = payload;
+
+  // update user data
+  const result = await prisma.$transaction(async (transactionClient: any) => {
+    // Update user data
+    const updatedUser = await transactionClient.user.update({
+      where: { id },
+      data: userData,
+    });
+
+    // Update user profile data
+    const updatedUserProfile = await transactionClient.userProfile.update({
+      where: { userId: id },
+      data: userProfileData,
+    });
+
+    return { updatedUser, updatedUserProfile };
   });
 
-  return profile;
+  // Fetch and return the updated user including the profile
+  const updatedUser = await prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: { userProfile: true },
+  });
+
+  const userWithOptionalPassword = updatedUser as UserWithOptionalPassword;
+  delete userWithOptionalPassword.password;
+
+  return userWithOptionalPassword;
 };
 
 export const userService = {
   registerUserIntoDB,
   getAllDonorFromDB,
   getMyProfileFromDB,
+  getUserDetailsFromDB,
   updateMyProfileIntoDB,
 };
