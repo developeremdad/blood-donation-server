@@ -14,7 +14,7 @@ router.post("/register", (0, validateRequest_1.default)(user_validation_1.userVa
 router.get("/get-users", (0, auth_1.default)("ADMIN"), user_controller_1.userController.getAllUsers);
 router.get("/donor-list", user_controller_1.userController.getAllDonor);
 router.get("/my-profile", (0, auth_1.default)("USER", "ADMIN"), user_controller_1.userController.getMyProfile);
-router.get("/user-details/:id", (0, auth_1.default)("USER", "ADMIN"), user_controller_1.userController.getUserDetails);
+router.get("/user-details/:id", user_controller_1.userController.getUserDetails);
 router.put("/update-profile", (0, auth_1.default)("USER", "ADMIN"), user_controller_1.userController.updateMyProfile);
 router.put("/update-user/:id", (0, auth_1.default)("ADMIN"), user_controller_1.userController.updateUserRoleStatus);
 router.post("/change-password", (0, auth_1.default)("USER", "ADMIN"), user_controller_1.userController.changePassword);
