@@ -38,6 +38,16 @@ const getMyDonationRequest = (0, catchAsync_1.default)((req, res) => __awaiter(v
         data: result,
     });
 }));
+const getMyDonation = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const result = yield request_service_1.requestServices.getMyDonationFromDB(user === null || user === void 0 ? void 0 : user.id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Donation retrieved successfully",
+        data: result,
+    });
+}));
 const updateRequestStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { requestId } = req.params;
     const result = yield request_service_1.requestServices.updateRequestStatusIntoDB(requestId, req.body);
@@ -51,5 +61,6 @@ const updateRequestStatus = (0, catchAsync_1.default)((req, res) => __awaiter(vo
 exports.requestController = {
     createRequest,
     getMyDonationRequest,
+    getMyDonation,
     updateRequestStatus,
 };

@@ -17,7 +17,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const createRequestIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const donor = yield prisma_1.default.user.findUnique({
+    const donor = yield prisma_1.default.user.findUniqueOrThrow({
         where: {
             id: payload.donorId,
         },
@@ -60,18 +60,22 @@ const getMyDonationRequestFromDB = (id) => __awaiter(void 0, void 0, void 0, fun
         },
         select: {
             id: true,
-            donorId: true,
-            requesterId: true,
             phoneNumber: true,
             dateOfDonation: true,
             hospitalName: true,
             hospitalAddress: true,
             reason: true,
             requestStatus: true,
+            donor: {
+                select: {
+                    bloodType: true,
+                },
+            },
             requester: {
                 select: {
                     id: true,
                     name: true,
+                    contact: true,
                     email: true,
                     bloodType: true,
                     location: true,
@@ -81,6 +85,34 @@ const getMyDonationRequestFromDB = (id) => __awaiter(void 0, void 0, void 0, fun
         },
     });
     return request;
+});
+const getMyDonationFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const donors = yield prisma_1.default.request.findMany({
+        where: {
+            requesterId: id,
+        },
+        select: {
+            id: true,
+            phoneNumber: true,
+            dateOfDonation: true,
+            hospitalName: true,
+            hospitalAddress: true,
+            reason: true,
+            requestStatus: true,
+            donor: {
+                select: {
+                    id: true,
+                    name: true,
+                    contact: true,
+                    email: true,
+                    bloodType: true,
+                    location: true,
+                    availability: true,
+                },
+            },
+        },
+    });
+    return donors;
 });
 const updateRequestStatusIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const request = yield prisma_1.default.request.update({
@@ -96,5 +128,6 @@ const updateRequestStatusIntoDB = (id, payload) => __awaiter(void 0, void 0, voi
 exports.requestServices = {
     createRequestIntoDB,
     getMyDonationRequestFromDB,
+    getMyDonationFromDB,
     updateRequestStatusIntoDB,
 };

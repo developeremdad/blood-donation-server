@@ -20,21 +20,21 @@ const registerUser = zod_1.default.object({
         password: zod_1.default.string({
             required_error: "Password is required!",
         }),
-        bloodType: zod_1.default.string({
-            required_error: "Blood type is required!",
-        }),
-        location: zod_1.default.string({
-            required_error: "Location is required!",
-        }),
+        // bloodType: z.string({
+        //   required_error: "Blood type is required!",
+        // }),
+        // location: z.string({
+        //   required_error: "Location is required!",
+        // }),
         age: zod_1.default.number().int({
             message: "Age must be an integer!",
         }),
         bio: zod_1.default.string({
             required_error: "Bio is required!",
         }),
-        lastDonationDate: zod_1.default.string({
-            required_error: "Last donation date is required!",
-        }),
+        // lastDonationDate: z.string({
+        //   required_error: "Last donation date is required!",
+        // }),
     }),
 });
 const updateProfileSchema = zod_1.default.object({

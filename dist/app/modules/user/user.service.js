@@ -58,6 +58,9 @@ const registerUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, functi
         password: hashedPassword,
         bloodType: payload.bloodType,
         location: payload.location,
+        availability: false,
+        contact: payload.contact,
+        photo: payload.photo,
     };
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield transactionClient.user.create({
@@ -83,6 +86,25 @@ const registerUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, functi
     const userWithOptionalPassword = user;
     delete userWithOptionalPassword.password;
     return user;
+});
+const getAllUsersFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.user.findMany({
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            bloodType: true,
+            location: true,
+            status: true,
+            availability: true,
+            role: true,
+            contact: true,
+            photo: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+    });
+    return result;
 });
 const getAllDonorFromDB = (params, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = (0, calculatePagination_1.calculatePagination)(paginationOptions);
@@ -125,7 +147,11 @@ const getAllDonorFromDB = (params, paginationOptions) => __awaiter(void 0, void 
             email: true,
             bloodType: true,
             location: true,
+            status: true,
             availability: true,
+            role: true,
+            contact: true,
+            photo: true,
             createdAt: true,
             updatedAt: true,
             userProfile: {
@@ -155,11 +181,13 @@ const getAllDonorFromDB = (params, paginationOptions) => __awaiter(void 0, void 
     const total = yield prisma_1.default.user.count({
         where: whereCondition,
     });
+    const totalPage = Math.ceil(total / limit);
     return {
         meta: {
             page,
             limit,
             total,
+            totalPage,
         },
         data: result,
     };
@@ -176,6 +204,9 @@ const getMyProfileFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
             bloodType: true,
             location: true,
             availability: true,
+            role: true,
+            contact: true,
+            photo: true,
             createdAt: true,
             updatedAt: true,
             userProfile: true,
@@ -183,18 +214,93 @@ const getMyProfileFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
     });
     return userProfile;
 });
+const getUserDetailsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prisma_1.default.user.findUniqueOrThrow({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            bloodType: true,
+            location: true,
+            availability: true,
+            role: true,
+            contact: true,
+            photo: true,
+            createdAt: true,
+            updatedAt: true,
+            userProfile: true,
+        },
+    });
+    return user;
+});
 const updateMyProfileIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const profile = yield prisma_1.default.userProfile.update({
+    const userProfileData = payload.userProfile;
+    delete payload.userProfile;
+    const userData = payload;
+    // update user data
+    const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        // Update user data
+        const updatedUser = yield transactionClient.user.update({
+            where: { id },
+            data: userData,
+        });
+        // Update user profile data
+        const updatedUserProfile = yield transactionClient.userProfile.update({
+            where: { userId: id },
+            data: userProfileData,
+        });
+        return { updatedUser, updatedUserProfile };
+    }));
+    // Fetch and return the updated user including the profile
+    const updatedUser = yield prisma_1.default.user.findUniqueOrThrow({
+        where: { id },
+        include: { userProfile: true },
+    });
+    const userWithOptionalPassword = updatedUser;
+    delete userWithOptionalPassword.password;
+    return userWithOptionalPassword;
+});
+const updateUserRoleStatusIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.user.update({
         where: {
-            userId: id,
+            id: id,
         },
         data: payload,
     });
-    return profile;
+    return result;
+});
+const changePassword = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = yield prisma_1.default.user.findUniqueOrThrow({
+        where: {
+            email: user.email,
+            status: "ACTIVATE",
+        },
+    });
+    const isCorrectPassword = yield bcrypt.compare(payload.oldPassword, userData.password);
+    if (!isCorrectPassword) {
+        throw new Error("Password incorrect!");
+    }
+    const hashedPassword = yield bcrypt.hash(payload.newPassword, 12);
+    yield prisma_1.default.user.update({
+        where: {
+            id: userData.id,
+        },
+        data: {
+            password: hashedPassword,
+        },
+    });
+    return {
+        message: "Password changed successfully!",
+    };
 });
 exports.userService = {
     registerUserIntoDB,
+    getAllUsersFromDB,
     getAllDonorFromDB,
     getMyProfileFromDB,
+    getUserDetailsFromDB,
     updateMyProfileIntoDB,
+    updateUserRoleStatusIntoDB,
+    changePassword
 };

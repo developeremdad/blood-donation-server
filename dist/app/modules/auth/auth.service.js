@@ -54,12 +54,15 @@ const loginUserFromDB = (payload) => __awaiter(void 0, void 0, void 0, function*
     }
     const accessToken = yield (0, generateToken_1.generateToken)({
         id: userData.id,
+        name: userData.name,
         email: userData.email,
+        role: userData.role,
     }, config_1.default.jwt.jwt_secret, config_1.default.jwt.expires_in);
     return {
         id: userData.id,
         name: userData.name,
         email: userData.email,
+        role: userData.role,
         token: accessToken,
     };
 });

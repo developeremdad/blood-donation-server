@@ -27,6 +27,17 @@ const registerUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    req.body.requesterId = user.id;
+    const result = yield user_service_1.userService.getAllUsersFromDB();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: "User Retrieve successfully",
+        data: result,
+    });
+}));
 const getAllDonor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     if (["A ", "B ", "AB ", "O "].includes((_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.bloodType)) {
@@ -40,6 +51,8 @@ const getAllDonor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
     const filters = (0, pickValidFields_1.default)(req.query, [
         "name",
         "age",
+        "status",
+        "role",
         "searchTerm",
         "lastDonationDate",
         "availability",
@@ -70,6 +83,16 @@ const getMyProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const getUserDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield user_service_1.userService.getUserDetailsFromDB(id);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "User details retrieved successfully",
+        data: result,
+    });
+}));
 const updateMyProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.user.id;
     const result = yield user_service_1.userService.updateMyProfileIntoDB(id, req.body);
@@ -80,9 +103,33 @@ const updateMyProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         data: result,
     });
 }));
+const updateUserRoleStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield user_service_1.userService.updateUserRoleStatusIntoDB(id, req.body);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "User updated successfully",
+        data: result,
+    });
+}));
+const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const result = yield user_service_1.userService.changePassword(user, req.body);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Password changed successfully",
+        data: result,
+    });
+}));
 exports.userController = {
     registerUser,
+    getAllUsers,
     getAllDonor,
     getMyProfile,
+    getUserDetails,
     updateMyProfile,
+    updateUserRoleStatus,
+    changePassword,
 };

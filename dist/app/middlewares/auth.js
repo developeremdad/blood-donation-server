@@ -17,7 +17,7 @@ const config_1 = __importDefault(require("../../config"));
 const prisma_1 = __importDefault(require("../../shared/prisma"));
 const AppError_1 = __importDefault(require("../errors/AppError"));
 const verifyToken_1 = require("../utils/verifyToken");
-const auth = () => {
+const auth = (...roles) => {
     return (req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const token = req.headers.authorization;
@@ -35,6 +35,9 @@ const auth = () => {
                 throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized!");
             }
             req.user = verifyUserToken;
+            if (roles.length && !roles.includes(verifyUserToken.role)) {
+                throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
+            }
             next();
         }
         catch (error) {
